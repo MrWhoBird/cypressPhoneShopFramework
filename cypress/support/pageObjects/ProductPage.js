@@ -1,26 +1,41 @@
-class ProductPage{
+class ProductPage {
 
-    selectOneProduct(){
-        cy.get('app-card').filter(`:contains("Blackberry")`).then( el => cy.wrap(el).contains('button', 'Add').click())
+    //locators
+    getProductsCards() {
+        return cy.get('app-card')
     }
 
-    selectFewProducts(productOne, productTwo, productThree){
-        cy.get('app-card').each( el => {
-            const phoneName = el.find('.card-title').text()
-            phoneName.includes(productOne) || 
-            phoneName.includes(productTwo) || 
-            phoneName.includes(productThree) ? 
-            cy.wrap(el).contains('button', 'Add').click() : 
-            true
+    getTotalPriceCounter() {
+        return cy.get('a.nav-link.btn-primary')
+    }
+
+    getCheckoutButton(){
+        return cy.contains('a','Checkout')
+    }
+
+    //actions
+    selectOneProduct(oneProduct) {
+        this.getProductsCards().filter(`:contains(${oneProduct})`).then(el => {
+            cy.wrap(el).contains('button', 'Add').click()
         })
     }
 
-    assertCartAmount(){
-        cy.get('a.nav-link.btn-primary').should('include.text', '4')
+    selectFewProducts(productArray) {
+        this.getProductsCards().each(el => {
+            const phoneName = el.find('.card-title').text()
+            for(let i=0; i < productArray.length; i++){
+                phoneName.includes(productArray[i]) ? cy.wrap(el).contains('button', 'Add').click() : true
+            }
+        })
     }
 
-    checkout(){
-        cy.contains('a','Checkout').click()
+    checkout() {
+        this.getCheckoutButton().click()
+    }
+
+    //assertions
+    assertCartAmount() {
+        this.getTotalPriceCounter().should('include.text', '4')
     }
 
 }
